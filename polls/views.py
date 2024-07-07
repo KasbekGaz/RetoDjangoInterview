@@ -4,40 +4,26 @@ from django.db.models import F
 from django.http import HttpResponseRedirect
 #from django.template import loader
 from .models import Question, Choice
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views import generic
+from django.views.generic.edit import CreateView, UpdateView
+from .forms import QuestionForm
 
 # pagina principal
-'''
-def index(request):
-    latest_question_list = Question.objects.order_by("-pub_date")[:5]
-    context = {"latest_question_list": latest_question_list}
-    return render(request, "polls/index.html", context)
-'''
 class IndexView(generic.ListView):
     template_name = "polls/index.html"
     context_object_name = "latest_question_list"
-
+    
     def get_queryset(self):
         """Devuelve las 5 primeras preguntas publicadas."""
         return Question.objects.order_by("-pub_date")[:5]
 
 # detalles
-'''
-def detail(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    return render(request, "polls/details.html", {"question": question})
-'''
 class DetailView(generic.DetailView):
     model = Question
     template_name = "polls/details.html"
 
 # resultados
-'''
-def results(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    return render(request, "polls/results.html", {"question":question})
-'''
 class ResultsView(generic.DetailView):
     model = Question
     template_name = "polls/results.html"
@@ -60,10 +46,18 @@ def vote(request, question_id):
     else:
         selected_choice.votes = F("votes") + 1
         selected_choice.save()
-        #Siempre devuelve un HttpResponseRedirect después de tratar con éxito
-        # con los datos POST esto evita que los datos se publiquen dos veces si
-        #el usuario presiona el botón Atrás
+        #Aqui se evita que los resultados se muestren dos veces si el usuario usa el botón atrás
         return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
 
+# Formulario de crear y actualizar.
+class QuestionCreateView(CreateView):
+    model = Question
+    form_class = QuestionForm
+    template_name = "polls/question_form.html"
+    success_url = reverse_lazy("polls:index") #redirige al index
 
-
+class QuestionUpdateView(UpdateView):
+    model = Question
+    form_class = QuestionForm
+    template_name = "polls/question_form.html"
+    success_url = reverse_lazy("polls:index")

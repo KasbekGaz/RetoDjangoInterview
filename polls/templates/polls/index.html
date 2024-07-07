@@ -1,12 +1,17 @@
 {% if latest_question_list %}
-    <ul>
-    {% for question in latest_question_list %}
-        <!--- La foma anterior
+<ul>
+  {% for question in latest_question_list %}
+  <!--- La foma anterior
         <li><a href="/polls/{{ question.id }}/">{{ question.question_text }}</a></li> 
         -->
-        <li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>
-    {% endfor %}
-    </ul>
+  <li>
+    <a href="{% url 'polls:detail' question.id %}"
+      >{{ question.question_text }}</a
+    >
+    - Dificultad: {{ question.dificultad }}
+  </li>
+  {% endfor %}
+</ul>
 {% else %}
-    <p>No polls are available.</p>
+<p>No polls are available.</p>
 {% endif %}
